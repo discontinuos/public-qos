@@ -1,5 +1,5 @@
 # public-qos
-Aplicación para el seguimiento de disponibilidad de sitios en Internet.
+Aplicación para el seguimiento de disponibilidad de sitios en Internet. Verifica a intervalos regulares una lista de dirección para averiguar su disponibilidad efectiva a lo largo del tiempo.
 
 # Descripción
 public-qos es una aplicación escrita en Python para el moniteo de disponibilidad de sitios web. Está diseñada para funcionar minimizando el consumo de recursos (procesador, red y disco rígido) dando un registro de las mediciones realizadas. 
@@ -9,7 +9,7 @@ El propósito de esta herramienta fue realizar una medición anual de calidad de
 1. La medición debía ser regular, homogénea y priorizar la validez de los resultados. El sitio controla su propia conectividad a interne antes de cada medición y generar registros separados de resultados y errores.
 2. Debía poder ejecutarse en un ambiente 'neutral' (fuera de Argentina) y estable de bajo costo. Es decir, no era la intención  ejecutarse en la PC del investigador, dado que debía no reiniciarse ni sufrir problemas de conexión durante 1 año continuo. Se utilizó una cuenta gratuita de AWS (12 meses) con un cron de ejecución cada 60 segundos.
 3. Debían poderse medir muchos sitios a la vez, sin que esto distorsione los resultados. Para esto la herramienta implementa un balanceo de carga y un manejo de timeouts para los pedidos lentos o sin respuesta. Incluso cuando mide cada 10 minutos cada sitio, reparte estos pedidos en ejecuciones cada 60 segundos.
-4. Para registrar cada 10 minutos, durante 1 año, al menos 150 sitios, el uso de espacio debía ser optimizado (reducir la redundancia). Para esto el sitio genera archivos binarios consumiendo 3 bytes por cada medición en cada sitio (en ellos almacena el status de la respuesta y los milisegundos del roundtrip).
+4. Para registrar cada 10 minutos, durante 1 año, al menos 150 sitios, el uso de espacio debía ser optimizado (reducir la redundancia). Para esto el sitio genera archivos binarios consumiendo 3 bytes por cada medición en cada sitio (en ellos almacena el status de la respuesta y los milisegundos consumidos en el pedido).
 5. Para poder monitorear los resultados parciales sin conectarse al ambiente de producción, la herramienta produce copias en espejo (externas) de los resultados parciales. Este objetivo mitigaba el hecho de que conectarse a producción podía afectar al registro de los datos, pudiéndose por ejemplo bloquear accidentalmente alguno de ellos al consultarlo. Para esto el sitio realiza automáticamente envíos de los binarios del mes hacia un servidor externo en los momentos en que no se encuentra monitoreando.
 
 # Instalación y requerimientos
@@ -69,14 +69,14 @@ En la carpeta /errors hay un log de errors. En la carpeta /logs se genera una l�
 
 # Más información
 El proceso de ejecución del monitor puede resumirse en los siguientes pasos:
-1. El monitor averigua primero qué cosas tiene para verificar (ejecutar un pedido http o https para ver la respuesta). Para eso lee del archivo config/monitors.ini la lista de monitores que esté definida
+1. El monitor averigua primero qué cosas tiene para verificar. Para eso lee del archivo config/monitors.ini la lista de monitores que esté definida
   Los monitores tienen su nombre en dos partes, separados por un guión (por ejemplo CONICET-SIGEVA).
   
 2. Para cada monitor tiene un intervalo (en minutos) y un offset. Estos parámetros están definidos por valores default (para todos los monitores) en el archivo config/config.ini, y pueden también especificarse para cada monitor. Si el intervalo es 10, se tomará una muestra cada 10 minutos. El offset sirve para distribuir los monitores en los diferentes minutos que tiene una hora. De esta forma, si el offset es 0, se tomará a las 0, 10, 20, etc. minutos de cada hora. Si el offset es 1, se tomará al minuto 1, 11, 21, etc. de cada hora. El offset default asigna en forma aleatoria a los monitores a lo largo de las mediciones, manteniendo estable el intervalo.
 
 3. Antes de comenzar a medir, ejecute un test de respuesta para validar que el agente de medición tiene conexión a internet. Esto lo hace ejecutando un pedido hacia google.com. El resultado del mismo se almacena igual que los demás monitores. Si este monitor falla, los demás no son evaluados, registrándose para ellos el resultado OFFLINE, que representa que el punto de medición no tenía acceso a internet para ese momento en el tiempo.
 
-4. Para todos los monitores que deben tomar su muestra en el minuto en ejecución, el monitor navega la url indicada. Al hacerlo utiliza el timeout de http indicado en el archivo config/config.ini. Luego almacena el resultado en un archivo por mes y monitor, dentro de la carpeta /results. 
+4. Para todos los monitores que deben tomar su muestra en el minuto en ejecución, el monitor navega la url indicada. Para eso, ejecuta un pedido http o https y analiza la respuesta (el status de respuesta y una longitud mayor a cero). Si hay redirects, los sigue. Para hacer esta verificación, utiliza el timeout de http indicado en el archivo config/config.ini. Luego almacena el resultado en un archivo por mes y monitor, dentro de la carpeta /results. 
     Los archivos tienen un formato binario, con bloques de 3 bytes que almacenan el tiempo de respuesta (en un uint16 en milisegundos), y un byte con el código de la respuesta (resultado del código HTTP o tipo de error no http, ej. Timeout). 
      Ese archivo no almacena en forma explícita la hora de registro de cada muestra, ya que la posición de cada entrada se corresponde con su posición en el tiempo considerado desde el inicio del mes que registra. De este modo, el archivo con nombre CONICET-SIGEVA#2016-12#5-2#MN1#r1 registra los datos para el monitor de CONICET, url de SIGEVA, mes 12 del 2016, con intervalos de 5 minutos y un offset de 2. 
        En su contenido, en la primera posición habrá un registro de 3 bytes que da cuenta de la medición hecha el día 1 de diciembre de 2016 a las 0:02. La siguiente posición contiene los valores para el mismo día, con hora 0:07 (offset 2 más intervalo 5), y así sucesivamente. Los monitores se ejecutan utilizando threads en paralelo, encolándose luego de alcanzarse el máximo de threads indicados en config/config.ini. Se recomienda no utilizar una cantidad excesiva de threads para no saturar la conexión local y perjudicar la medición.
