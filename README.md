@@ -67,6 +67,9 @@ Los archivos convertidos pueden ser analizados con herramientas de análisis de 
 
 En la carpeta /errors hay un log de errors. En la carpeta /logs se genera una línea por cada ejecución. 
 
+# Consultas y sugerencias
+Para consultas o sugerencias, escribir a pablodg@gmail.com.
+
 # Más información
 El proceso de ejecución del monitor puede resumirse en los siguientes pasos:
 1. El monitor averigua primero qué cosas tiene para verificar. Para eso lee del archivo config/monitors.ini la lista de monitores que esté definida
