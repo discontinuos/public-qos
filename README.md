@@ -85,3 +85,6 @@ El proceso de ejecución del monitor puede resumirse en los siguientes pasos:
   La lista de mirrors a mantener actualizados se encuentra en config/mirrors.ini. La frecuencia de actualización puede ser diaria o semanal. Si corresponde realizar la actualización, el monitor envía al servidor de storage (mirror) los datos de los monitores para el mes actual en un archivo zip, con los archivos de configuración y logs anexados. La url del mirror debe apuntar a una versión ejecutable del script monitorEndPoint.php diseñado para recibir los datos. En ese archivo es posible indicar un key que también se indica en el archivo mirrors.ini que se envía como parámetro a modo de token de acceso. Para evitar bloqueos sobre los archivos durante el envío de los datos, el monitor primero genera los zips para todos los mirrors, y luego envía secuencialmente los datos a cada servidor de mirroring.
 
 6. Por último, el Monitor examina la carpeta local /next para copiar de ella una versión nueva del monitor sobre los archivos existentes en la carpeta principal.
+
+# Agradecimientos
+El diseño de esta herramienta se vio beneficiada por las charlas e intercambios con Rodrigo Queipo y con Manuel Aristarán en sus etapas iniciales. A ellos mis agradecimientos.
