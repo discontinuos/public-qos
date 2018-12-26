@@ -13,6 +13,7 @@ El propósito de esta herramienta fue realizar una medición anual de calidad de
 5. Para poder monitorear los resultados parciales sin conectarse al ambiente de producción, la herramienta produce copias en espejo (externas) de los resultados parciales. Este objetivo mitigaba el hecho de que conectarse a producción podía afectar al registro de los datos, pudiéndose por ejemplo bloquear accidentalmente alguno de ellos al consultarlo. Para esto el sitio realiza automáticamente envíos de los binarios del mes hacia un servidor externo en los momentos en que no se encuentra monitoreando.
 
 # INSTALACIÓN Y REQUERIMIENTOS
+## Instalación
 El sitio funciona como scripts de Python 3, sin requerir instalación de componentes o módulos externos. 
 
 El idioma Python se eligió por su portabilidad y por su facilidad para el manejo de colas y threads. En cada medición los pedidos deben organizarse en paralelo (ej. verificar a la vez 10 sitios), con límites de pedidos simultáneos para no saturar la conexión.
@@ -25,8 +26,7 @@ Para hacer funcionar la aplicación debe ejecutarse cada 1 minuto el script Main
 ## Actualización
 En una instalación productiva, las nuevas versiones deben ponerse en la carpeta /next, de la cual el monitor copia los archivos de Python sobre el directorio principal. Este proceso buscar evitar que durante la copia manual de nuevos archivos .py se ejecute el monitor y ocurra una ejecución inválida por fuentes inconsistentes.
 
-# CONFIGURACION
-
+# CONFIGURACIÓN
 ## config.ini
 En el archivo viewer/config/config.ini se encuentran las opciones de configuración del monitoreo.
 
@@ -65,7 +65,7 @@ Si se monitorea un conjunto de sitios, también puede realizarse masivamente la 
   
 Los archivos convertidos pueden ser analizados con herramientas de análisis de datos (R+, Excel, SPSS, etc). También pueden ser visualizados con un visualizador web (en PHP)  provisto por la herramienta. Este visualizador genera una vista tabulada poniendo la salida de folder2csv en /viewer/results.
 
-# PROCESO GENERAL
+# Más información
 
 Cómo sé qué está midiendo
 
