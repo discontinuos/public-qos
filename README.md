@@ -12,6 +12,10 @@ El propósito de esta herramienta fue realizar una medición anual de calidad de
 4. Para registrar cada 10 minutos, durante 1 año, al menos 150 sitios, el uso de espacio debía ser optimizado (reducir la redundancia). Para esto el sitio genera archivos binarios consumiendo 3 bytes por cada medición en cada sitio (en ellos almacena el status de la respuesta y los milisegundos consumidos en el pedido).
 5. Para poder monitorear los resultados parciales sin conectarse al ambiente de producción, la herramienta produce copias en espejo (externas) de los resultados parciales. Este objetivo mitigaba el hecho de que conectarse a producción podía afectar al registro de los datos, pudiéndose por ejemplo bloquear accidentalmente alguno de ellos al consultarlo. Para esto el sitio realiza automáticamente envíos de los binarios del mes hacia un servidor externo en los momentos en que no se encuentra monitoreando.
 
+Los resultados de una medición realizada para Argentina pueden encontrarse aquí:
+
+De Grande, P. (2018). Gobierno electrónico y accesibilidad: Disponibilidad de servicio en las plataformas online estatales de la Argentina. _Ciencias Administrativas_, (15), 051.
+
 # Instalación y requerimientos
 ### Instalación
 El sitio funciona como scripts de Python 3, sin requerir instalación de componentes o módulos externos. 
